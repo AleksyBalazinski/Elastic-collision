@@ -8,6 +8,7 @@ double v1_f_x(double v1, double v2, double m1, double m2, double theta1, double 
 double v1_f_y(double v1, double v2, double m1, double m2, double theta1, double theta2, double phi);
 double v2_f_x(double v1, double v2, double m1, double m2, double theta1, double theta2, double phi);
 double v2_f_y(double v1, double v2, double m1, double m2, double theta1, double theta2, double phi);
+double phi(int x1, int x2, int y1, int y2);
 
 class point
 {
@@ -25,7 +26,7 @@ int main()
 {
 	const int window_x = 800;
 	const int window_y = 800;
-	const int a = 20;
+	const int a = 50;
 	RenderWindow window(VideoMode(window_x, window_y), "Simulation");
 	window.setFramerateLimit(30); 
 	const double dt = 0.0333; //duration of one frame
@@ -63,6 +64,10 @@ int main()
 	line2.setFillColor(Color::Red);
 	bool start = false;
 	bool hit = false;
+	bool on_obj1 = false;
+	bool on_obj2 = false;
+	int rim_hit1 = 0; //let's mark boundaries as fallows: 0 - no boundary, 1 - up, 2 - right, 3 - down, 4 - left
+	int rim_hit2 = 0;
 	std::cout << "Enter initial velocity for object 1 (green)\n";
 	std::cin >> v1;
 	std::cout << "\nEnter initial velocity for object 2 (red)\n";
@@ -77,64 +82,96 @@ int main()
 		while (window.pollEvent(evt))
 		{
 			if (evt.type == Event::Closed) window.close();
+			if (evt.type == Event::MouseButtonPressed && start == false)
+			{
+				if (evt.mouseButton.button == Mouse::Left)
+				{
+					if (evt.mouseButton.x >= x1 && evt.mouseButton.x <= x1 + a
+						&& evt.mouseButton.y >= y1 && evt.mouseButton.y <= y1 + a)
+					{
+						on_obj1 = true; //mouse was left-clicked when cursor was on object1
+						on_obj2 = false;
+					}
+					else if(evt.mouseButton.x >= x2 && evt.mouseButton.x <= x2 + a
+						&& evt.mouseButton.y >= y2 && evt.mouseButton.y <= y2 + a)
+					{
+						on_obj2 = true; //mouse was left-clicked when cursor was on object2
+						on_obj1 = false;
+					}
+					else
+					{
+						on_obj1 = false;
+						on_obj2 = false;
+					}
+				}
+			}
 			if (evt.type == Event::KeyPressed)
 			{
 				if (evt.key.code == Keyboard::Escape) window.close();
-				//move oject1
-				if (evt.key.code == Keyboard::Num1 && start == false)
+				
+				if (evt.key.code == Keyboard::Up && start == false)
 				{
-					object1.move(0, -5);
-					y1 -= 5;
-					line1.move(0, -5);
+					if (on_obj1 == true)
+					{
+						object1.move(0, -5);
+						y1 -= 5;
+						line1.move(0, -5);
+					}
+					if (on_obj2 == true)
+					{
+						object2.move(0, -5);
+						y2 -= 5;
+						line2.move(0, -5);
+					}
 				}
-				if (evt.key.code == Keyboard::Num2 && start == false)
+				if (evt.key.code == Keyboard::Down && start == false)
 				{
-					object1.move(0, 5);
-					y1 += 5;
-					line1.move(0, 5);
+					if (on_obj1 == true)
+					{
+						object1.move(0, 5);
+						y1 += 5;
+						line1.move(0, 5);
+					}
+					if (on_obj2 == true)
+					{
+						object2.move(0, 5);
+						y2 += 5;
+						line2.move(0, 5);
+					}
 				}
-				if (evt.key.code == Keyboard::Num3 && start == false)
+				if (evt.key.code == Keyboard::Right && start == false)
 				{
-					line1.rotate(1);
-					angle1 += 1;
+					if (on_obj1 == true)
+					{
+						line1.rotate(1);
+						angle1 += 1;
+					}
+					if (on_obj2 == true)
+					{
+						line2.rotate(1);
+						angle2 += 1;
+					}
 				}
-				if (evt.key.code == Keyboard::Num4 && start == false)
+				if (evt.key.code == Keyboard::Left && start == false)
 				{
-					line1.rotate(-1);
-					angle1 -= 1;
-				}
-				//move object2
-				if (evt.key.code == Keyboard::Num5 && start == false)
-				{
-					object2.move(0, -5);
-					y2 -= 5;
-					line2.move(0, -5);
-				}
-				if (evt.key.code == Keyboard::Num6 && start == false)
-				{
-					object2.move(0, 5);
-					y2 += 5;
-					line2.move(0, 5);
-				}
-				if (evt.key.code == Keyboard::Num7 && start == false)
-				{
-					line2.rotate(1);
-					angle2 += 1;
-				}
-				if (evt.key.code == Keyboard::Num8 && start == false)
-				{
-					line2.rotate(-1);
-					angle2 -= 1;
+					if (on_obj1 == true)
+					{
+						line1.rotate(-1);
+						angle1 -= 1;
+					}
+					if (on_obj2 == true)
+					{
+						line2.rotate(-1);
+						angle2 -= 1;
+					}
 				}
 				if (evt.key.code == Keyboard::Space)
 				{
 					start = true;
-
 				}
-				//...
 			}
 		}
-		//motion
+		//motion before collision
 		
 		if (start == true && hit == false) 
 		{
@@ -144,7 +181,7 @@ int main()
 			t += dt;
 		}
 
-		//collision mechanism
+		//collision detection
 		A.SetNew(object1.getPosition().x, object1.getPosition().y);
 		B.SetNew(object1.getPosition().x + a, object1.getPosition().y);
 		C.SetNew(object1.getPosition().x + a, object1.getPosition().y + a);
@@ -163,23 +200,42 @@ int main()
 			y2 = object2.getPosition().y;
 			hit = true;
 		}
-		//after collision
+		//motion after collision
 		if (hit == true)
 		{
-			object1.setPosition(x1 + v1_f_x(v1,v2,m1,m2,d_r(angle1),d_r(angle2), d_r(angle1))*t_after, //assume m1 >> m2 FIX THAT!!!
+			object1.setPosition(x1 + v1_f_x(v1, v2, m1, m2, d_r(angle1), d_r(angle2), phi(x1, x2, y1, y2)) * t_after, //assume m1 >> m2 FIX THAT!!!
 				y1 + v1_f_y(v1, v2, m1, m2, d_r(angle1), d_r(angle2), 0)*t_after);
-			object2.setPosition(x2 + v2_f_y(v1, v2, m1, m2, d_r(angle1), d_r(angle2), d_r(angle1))*t_after,
+			object2.setPosition(x2 + v2_f_y(v1, v2, m1, m2, d_r(angle1), d_r(angle2), phi(x1, x2, y1, y2)) * t_after,
 				y2 + v2_f_y(v1, v2, m1, m2, d_r(angle1), d_r(angle2), 0)*t_after);
 
 			t_after += dt;
 		}
+		//boundary hit: to be done in a next version
+		/*if ((object1.getPosition().x <= 0 || object1.getPosition().x + a >= window_x
+			|| object1.getPosition().y <= 0 || object1.getPosition().y + a >= window_y) && start == false)
+		{
+			rim_hit1 = true;
+		}
+		if ((object2.getPosition().x <= 0 || object2.getPosition().x + a >= window_x
+			|| object2.getPosition().y <= 0 || object2.getPosition().y + a >= window_y) && start == false)
+		{
+			rim_hit2 = true;
+		}
+		if (rim_hit1 == true)
+		{
 
+		}
+		if (rim_hit2 == true)
+		{
+
+		}*/
+		//draw stuff
 		window.clear();
 		window.draw(line1);
 		window.draw(line2);
 		window.draw(object1);
 		window.draw(object2);
-		//window.draw(...)
+		//display everything
 		window.display();
 	}
 }
@@ -208,4 +264,8 @@ double v2_f_y(double v1, double v2, double m1, double m2, double theta1, double 
 {
 	return (((v2 * cos(theta2 - phi) * (m2 - m1) + 2 * m1 * v1 * cos(theta1 - phi)) / (m1 + m2))
 		* sin(phi) + v2 * sin(theta2 - phi) * sin(phi + 3.14159 / 2));
+}
+double phi(int x1, int x2, int y1, int y2)
+{
+	return atan((y2 - y1) / (x2 - x1));
 }
