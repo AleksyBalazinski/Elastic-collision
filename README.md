@@ -8,4 +8,4 @@ _Right arrow_ - rotate velocity vector clockwork wise
 _Left arrow_ - rotate velocity vector counter-clockwork wise
 _Spacebar_ - start simulation, i.e. let the objects move along specified trajectories
 ### What are the mechanics behind this program?
-The program uses formulas which can be found [here](https://en.wikipedia.org/wiki/Elastic_collision) to show objects' behavior after the collision and cmath library for sin, cos and arctan functions. 
+The program uses formulas which can be found [here](https://en.wikipedia.org/wiki/Elastic_collision) (section Two-dimentional / Two-dimensional collision with two moving objects) to show objects' behavior after the collision and cmath library for sin, cos and arctan functions. 
