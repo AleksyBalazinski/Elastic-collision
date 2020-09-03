@@ -1,3 +1,5 @@
+/*For personal use only.*/
+
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <iostream>
