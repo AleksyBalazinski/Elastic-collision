@@ -199,7 +199,7 @@ int main()
 				}
 			}
 		}
-		if (read_once == false) // read position ob object1 & object2 immediately after spacebar has been pressed
+		if (read_once == false) // read position of object1 & object2 immediately after spacebar has been pressed
 		{
 			x1 = object1.getPosition().x;
 			y1 = object1.getPosition().y;
