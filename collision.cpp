@@ -86,7 +86,7 @@ int main()
 
 	//font
 	Font font;
-	font.loadFromFile("consola.ttf"); //your font
+	font.loadFromFile("some_font.ttf"); //replace with your font
 	Text desc1;
 	desc1.setFont(font);
 	std::string v1_str = std::to_string(static_cast<int>(v1));
@@ -108,7 +108,6 @@ int main()
 	desc2.setOutlineColor(Color::White);
 	desc2.setOutlineThickness(1);
 	
-
 	while (window.isOpen())
 	{
 		Event evt;
@@ -222,7 +221,7 @@ int main()
 			fire = false;
 		}
 		
-		if (hit == true) //velocities after collision
+		if (hit == true) //velocities after collision with another object
 		{
 			v1_x = v1_f_x(v1, v2, m1, m2, d_r(angle1), d_r(angle2), phi(x1, x2, y1, y2));
 			v1_y = v1_f_y(v1, v2, m1, m2, d_r(angle1), d_r(angle2), phi(x1, x2, y1, y2));
@@ -230,10 +229,10 @@ int main()
 			v2_x = v2_f_x(v1, v2, m1, m2, d_r(angle1), d_r(angle2), phi(x1, x2, y1, y2));
 			v2_y = v2_f_y(v1, v2, m1, m2, d_r(angle1), d_r(angle2), phi(x1, x2, y1, y2));
 		}
-
+		//velocities after hitting the boundary
 		if (rim_hit1 == 1 || rim_hit1 == 3)
 		{
-			v1_y = (-1)*v1_y;
+			v1_y = (-1) * v1_y; //symmetric reflection
 			rim_hit1 = 0;
 			std::cout << "\ncollsion with the boundary 1 or 3!";
 			hit = false;
@@ -267,7 +266,7 @@ int main()
 			object1.setPosition(x1 + v1_x * t, y1 + v1_y * t);
 			object2.setPosition(x2 + v2_x * t, y2 + v2_y * t);
 		}
-		//collision detection
+		//detection of collision with another object (this can be done better I guess)
 		A.SetNew(object1.getPosition().x, object1.getPosition().y);
 		B.SetNew(object1.getPosition().x + a, object1.getPosition().y);
 		C.SetNew(object1.getPosition().x + a, object1.getPosition().y + a);
@@ -283,7 +282,7 @@ int main()
 			hit = true;
 			read_once = false;
 		}
-		//boundary hit: to be done in a next version
+		//boundary detection
 		if ((object1.getPosition().y <= 0) && start == true) { rim_hit1 = 1; read_once = false; }
 		if ((object1.getPosition().x + a >= window_x) && start == true) { rim_hit1 = 2;  read_once = false; }
 		if ((object1.getPosition().y + a >= window_y) && start == true) { rim_hit1 = 3;  read_once = false; }
@@ -310,12 +309,12 @@ int main()
 		window.display();
 	}
 }
-
+//convert degrees to radians
 double d_r(double degrees)
 {
 	return ((3.14159 / 180) * degrees);
 }
-
+//objects' behavior after collision is determined by these formulas
 double v1_f_x(double v1, double v2, double m1, double m2, double theta1, double theta2, double phi)
 {
 	return (((v1 * cos(theta1 - phi) * (m1 - m2) + 2 * m2 * v2 * cos(theta2 - phi)) / (m1 + m2)) 
@@ -336,6 +335,7 @@ double v2_f_y(double v1, double v2, double m1, double m2, double theta1, double 
 	return (((v2 * cos(theta2 - phi) * (m2 - m1) + 2 * m1 * v1 * cos(theta1 - phi)) / (m1 + m2))
 		* sin(phi) + v2 * sin(theta2 - phi) * sin(phi + 3.14159 / 2));
 }
+//calculate contact angle
 double phi(int x1, int x2, int y1, int y2)
 {
 	return atan((y2 - y1) / (x2 - x1));
