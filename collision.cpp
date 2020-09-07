@@ -325,7 +325,7 @@ double d_r(double degrees)
 {
 	return ((3.14159 / 180) * degrees);
 }
-//objects' behavior after collision is determined by these formulas
+//objects' behavior after collision is determined by these formulae
 
 double v1_f_x(double v1, double v2, double m1, double m2, double theta1, double theta2, double phi)
 {
