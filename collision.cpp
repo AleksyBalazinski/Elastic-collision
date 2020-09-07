@@ -220,6 +220,10 @@ int main()
 			v2_x = v2 * cos(d_r(angle2));
 			v2_y = v2 * sin(d_r(angle2));
 
+			v1_str = std::to_string(static_cast<int>(sqrt(v1_x * v1_x + v1_y * v1_y)));
+			desc1.setString("v = " + v1_str + "\n" + "m = " + m1_str);
+			v2_str = std::to_string(static_cast<int>(sqrt(v2_x * v2_x + v2_y * v2_y)));
+			desc2.setString("v = " + v2_str + "\n" + "m = " + m1_str);
 			fire = false;
 		}
 		
@@ -230,6 +234,11 @@ int main()
 
 			v2_x = v2_f_x(v1, v2, m1, m2, d_r(angle1), d_r(angle2), phi(x1, x2, y1, y2));
 			v2_y = v2_f_y(v1, v2, m1, m2, d_r(angle1), d_r(angle2), phi(x1, x2, y1, y2));
+
+			v1_str = std::to_string(static_cast<int>(sqrt(v1_x * v1_x + v1_y * v1_y)));
+			desc1.setString("v = " + v1_str + "\n" + "m = " + m1_str);
+			v2_str = std::to_string(static_cast<int>(sqrt(v2_x * v2_x + v2_y * v2_y)));
+			desc2.setString("v = " + v2_str + "\n" + "m = " + m1_str);
 		}
 		//velocities after hitting the boundary
 		if (rim_hit1 == 1 || rim_hit1 == 3)
@@ -317,6 +326,7 @@ double d_r(double degrees)
 	return ((3.14159 / 180) * degrees);
 }
 //objects' behavior after collision is determined by these formulas
+
 double v1_f_x(double v1, double v2, double m1, double m2, double theta1, double theta2, double phi)
 {
 	return (((v1 * cos(theta1 - phi) * (m1 - m2) + 2 * m2 * v2 * cos(theta2 - phi)) / (m1 + m2)) 
